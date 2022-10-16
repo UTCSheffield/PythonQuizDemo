@@ -1,17 +1,42 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Edit "{{ post['title'] }}"{% endblock %}</h1>
+  <h1>{% block title %}Edit "{{ question['text'] }}"{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
   <form method="post">
     <label for="question">Question</label>
-    <input name="text" id="text" value="{{ request.form['text'] or question['text'] }}" required>
+    <input name="text" id="text" value="{{ request.form['text'] or question['text'] }}" required />
+    <table>
+      <tr><th>Answer</th><th>Correct</th></tr>
+        {% for answer in question.answers %}
+          <tr>
+            <td>
+              <input type="hidden" name="answers[{{loop.index}}][id]" value="{{ answer.id }}" />
+              <input name="answers[{{loop.index}}][text]" value="{{ answer.text }}" />
+            </td>
+            <td>
+              <input type="checkbox" name="answers[{{loop.index}}][correct]" value="{{ answer.correct }}" />
+            </td>
+          </tr>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td>
+          New 
+          <input name="answers[{{question.answers.count}}][text]" value="" />
+        </td>
+        <td>
+          <input type="checkbox" name="answers[{{question.answers.count}}][correct]" value="" />
+        </td>
+      </tr>
+  
+    </table>
     <input type="submit" value="Save">
   </form>
   <hr>
-  <form action="{{ post.delete_url }}" method="post">
+  <form action="{{ question.delete_url }}" method="post">
     <input class="danger" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
   </form>
 {% endblock %}

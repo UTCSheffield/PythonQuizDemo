@@ -18,7 +18,7 @@ bp = Blueprint("quiz", __name__)
 def index():
     """Show all the questions, most recent first."""
     select = db.select(Question).order_by(Question.created.desc())
-    questions = db.session.execute(select).scalars()
+    questions = db.session.execute(select).scalars().unique()
     return render_template("quiz/index.html", questions=questions)
 
 
@@ -72,7 +72,10 @@ def update(id):
 
     if request.method == "POST":
         text = request.form["text"]
-        body = request.form["body"]
+        print("request.form", request.form)
+        new_answers = request.form["answers"]
+        
+        
         error = None
 
         if not text:

@@ -16,7 +16,7 @@ class Question(db.Model):
     author_id = db.Column(db.ForeignKey(User.id), nullable=False)
     created = db.Column(db.DateTime, nullable=False, default=now_utc)
     text = db.Column(db.String, nullable=False)
-    answers = db.relationship("Answer", back_populates="question")
+    answers = db.relationship("Answer", lazy="joined", back_populates="question")
     author = db.relationship(User, lazy="joined", back_populates="questions")
 
     @property

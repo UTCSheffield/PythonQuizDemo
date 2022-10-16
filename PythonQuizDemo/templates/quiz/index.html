@@ -10,14 +10,13 @@
 {% block content %}
   {% for question in questions %}
     <article class="question">
-      <header>
+      <header> 
+        
         <div>
           <h1>{{ question['text'] }}</h1>
+          <div></div>
           <div class="about">by {{ question.author.username }} on {{ question.created.strftime('%Y-%m-%d') }}</div>
-          {% for answer in question,answers %}
-          {{ answer.text }}
-          {% if not loop.last %},
-          {% endfor %}          
+                    
         </div>
         {% if g.user['id'] == question['author_id'] %}
           <a class="action" href="{{ question.update_url }}">Edit</a>
