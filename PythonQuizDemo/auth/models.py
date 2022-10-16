@@ -13,6 +13,8 @@ class User(db.Model):
     # posts = db.relationship("Post", back_populates="author")
     questions = db.relationship("Question", back_populates="author")
     
+    def __repr__(self) -> str:
+        return self.username
 
     def set_password(self, value):
         """Store the password as a hash for security."""

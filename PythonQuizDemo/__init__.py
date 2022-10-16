@@ -4,6 +4,10 @@ import click
 from flask import Flask
 from flask.cli import with_appcontext
 from flask_sqlalchemy import SQLAlchemy
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+
+#https://flask-admin.readthedocs.io/en/latest/introduction/#getting-started
 
 __version__ = (1, 0, 0, "dev")
 
@@ -40,6 +44,7 @@ def create_app(test_config=None):
 
     # apply the blueprints to the app
     from PythonQuizDemo import auth, quiz
+    #from PythonQuizDemo.auth.models import auth, quiz
 
     app.register_blueprint(auth.bp)
     app.register_blueprint(quiz.bp)
@@ -47,6 +52,11 @@ def create_app(test_config=None):
     # make "index" point at "/", which is handled by "blog.index"
     app.add_url_rule("/", endpoint="index")
 
+    app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
+    admin = Admin(app, name='quizdemo', template_mode='bootstrap3')
+    admin.add_view(ModelView(auth.models.User, db.session))
+    admin.add_view(ModelView(quiz.models.Question, db.session))
+    
     return app
 
 

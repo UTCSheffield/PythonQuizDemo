@@ -1,3 +1,5 @@
+from wtforms_sqlalchemy.orm import model_form
+
 from flask import Blueprint
 from flask import flash
 from flask import g
@@ -9,7 +11,7 @@ from werkzeug.exceptions import abort
 
 from PythonQuizDemo import db
 from PythonQuizDemo.auth.views import login_required
-from PythonQuizDemo.quiz.models import Question, Answer
+from PythonQuizDemo.quiz.models import Question
 
 bp = Blueprint("quiz", __name__)
 
@@ -45,24 +47,29 @@ def get_question(id, check_author=True):
 @bp.route("/create", methods=("GET", "POST"))
 @login_required
 def create():
-    """Create a new question for the current user."""
+    QuestionForm = model_form(Question, db.session, exclude=["created", "author"])
+
+    question=Question()
+    success = False
+
     if request.method == "POST":
-        text = request.form["text"]
-        #body = request.form["body"]
-        error = None
+        form = QuestionForm(request.form, obj=question)
+        if form.validate():
+            try:
+                form.populate_obj(question)
+            except ValueError as err:
+                flash(err)
+                return render_template("quiz/update.html", form=form, success=success,question=question)
 
-        if not text:
-            error = "Question Text is required."
-
-        if error is not None:
-            flash(error)
-        else:
-            db.session.add(Question(text=text, author=g.user))
+            question.author=g.user
+            db.session.add(question)
             db.session.commit()
-            return redirect(url_for("quiz.index"))
+            success = True
+            
+    else:
+        form = QuestionForm(obj=question)
 
-    return render_template("quiz/create.html")
-
+    return render_template("quiz/create_wtf.html", form=form, success=success)
 
 @bp.route("/<int:id>/update", methods=("GET", "POST"))
 @login_required
@@ -70,27 +77,26 @@ def update(id):
     """Update a question if the current user is the author."""
     question = get_question(id)
 
+    QuestionForm = model_form(Question, db.session,
+        field_args={"created":{ "render_kw" : {'readonly': True}},
+                    "author": { "render_kw" : {'readonly': True}}
+                    })  
+        #, exclude=["created", "author"])
+    success = False
+
     if request.method == "POST":
-        text = request.form["text"]
-        print("request.form", request.form)
-        new_answers = request.form["answers"]
-        
-        
-        error = None
-
-        if not text:
-            error = "Question Text is required."
-
-        if error is not None:
-            flash(error)
-        else:
-            question.text = text
-            #question.body = body
+        form = QuestionForm(request.form, obj=question)
+    
+        if form.validate():
+            form.populate_obj(question)
+            db.session.add(question)
             db.session.commit()
-            return redirect(url_for("quiz.index"))
+            success = True
+        
+    else:
+        form = QuestionForm(obj=question)
 
-    return render_template("quiz/update.html", question=question)
-
+    return render_template("quiz/update.html", form=form, success=success,question=question)
 
 @bp.route("/<int:id>/delete", methods=("POST",))
 @login_required

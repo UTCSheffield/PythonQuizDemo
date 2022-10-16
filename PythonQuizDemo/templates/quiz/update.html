@@ -5,35 +5,12 @@
 {% endblock %}
 
 {% block content %}
-  <form method="post">
-    <label for="question">Question</label>
-    <input name="text" id="text" value="{{ request.form['text'] or question['text'] }}" required />
-    <table>
-      <tr><th>Answer</th><th>Correct</th></tr>
-        {% for answer in question.answers %}
-          <tr>
-            <td>
-              <input type="hidden" name="answers[{{loop.index}}][id]" value="{{ answer.id }}" />
-              <input name="answers[{{loop.index}}][text]" value="{{ answer.text }}" />
-            </td>
-            <td>
-              <input type="checkbox" name="answers[{{loop.index}}][correct]" value="{{ answer.correct }}" />
-            </td>
-          </tr>
-        {% endfor %}
-      </tr>
-      <tr>
-        <td>
-          New 
-          <input name="answers[{{question.answers.count}}][text]" value="" />
-        </td>
-        <td>
-          <input type="checkbox" name="answers[{{question.answers.count}}][correct]" value="" />
-        </td>
-      </tr>
-  
-    </table>
-    <input type="submit" value="Save">
+  {% if success %}<p>Saved Successfully!</p>{% endif %}
+  <form method="post" action="">
+  {% for field in form %}
+      <p>{{ field.label }} {{ field }}</p>
+  {% endfor %}
+  <p><button type="submit">Submit</button></p>
   </form>
   <hr>
   <form action="{{ question.delete_url }}" method="post">
