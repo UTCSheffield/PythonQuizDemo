@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Edit "{{ post['title'] }}"{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <label for="question">Question</label>
+    <input name="text" id="text" value="{{ request.form['text'] or question['text'] }}" required>
+    <input type="submit" value="Save">
+  </form>
+  <hr>
+  <form action="{{ post.delete_url }}" method="post">
+    <input class="danger" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
+  </form>
+{% endblock %}

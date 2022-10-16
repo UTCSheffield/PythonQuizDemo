@@ -1,0 +1,4 @@
+graft PythonQuizDemo/static
+graft PythonQuizDemo/templates
+graft tests
+global-exclude *.pyc
